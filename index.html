@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="zh" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANWM</title>
+    <!-- <link rel="icon" href="source/Embodied-R.png" type="image/png"> -->
+    <link rel="stylesheet" href="https://cdn.staticfile.org/tailwindcss/2.2.19/tailwind.min.css">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+    <style>
+        :root {
+            --primary-color: #3182ce;
+            --primary-color-rgb: 49, 130, 206;
+            --secondary-color: #2c5282;
+            --accent-color: #4299e1;
+            --text-color: #2d3748;
+            --bg-color: #f7fafc;
+            --bg-color-rgb: 247, 250, 252;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --highlight-bg: #fef9f9;
+            --highlight-border: #fadbd8;
+            --shadow: 0 4px 15px rgba(0,0,0,0.05);
+            --transition: all 0.3s ease;
+            --gradient-start: #9f7aea; /* 浅紫色 */
+            --gradient-end: #63b3ed; /* 浅蓝色 */
+            --primary-dark: #aac1ee; /* 浅蓝色 */
+            --secondary-dark: #f6c2ec; /* 浅粉色 */
+        }
+
+        .dark {
+            --primary-color: #63b3ed;
+            --primary-color-rgb: 99, 179, 237;
+            --secondary-color: #90cdf4;
+            --accent-color: #4299e1;
+            --text-color: #e2e8f0;
+            --bg-color: #1a202c;
+            --bg-color-rgb: 26, 32, 44;
+            --card-bg: #2d3748;
+            --border-color: #4a5568;
+            --highlight-bg: #3c2a2a;
+            --highlight-border: #742a2a;
+            --shadow: 0 4px 15px rgba(0,0,0,0.3);
+            --gradient-start: #b794f4; /* 浅紫色 */
+            --gradient-end: #90cdf4; /* 浅蓝色 */
+            --primary-dark: #aac1ee; /* 浅蓝色 */
+            --secondary-dark: #f6c2ec; /* 浅粉色 */
+        }
+
+        /* 阅读进度条样式 */
+        .reading-progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+            width: 0%;
+            z-index: 9999;
+            transition: width 0.1s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Noto Sans SC', Tahoma, Arial, Roboto, "Droid Sans", "Helvetica Neue", "Droid Sans Fallback", "Heiti SC", "Hiragino Sans GB", Simsun, sans-serif;
+            line-height: 1.8;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            transition: var(--transition);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Noto Serif SC', serif, 'SimHei', 'Microsoft YaHei', '黑体', '宋体';
+            font-weight: 600;
+            line-height: 1.4;
+            color: #1a202c;
+            transition: var(--transition);
+        }
+
+        .content-container {
+            background-color: var(--card-bg);
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            max-width: 1300px;
+            margin: 2rem auto;
+            padding: 2.5rem;
+        }
+
+        .main-title {
+            font-size: 2.5rem;
+            text-align: center !important;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 3px solid var(--border-color);
+            color: #1a202c;
+            transition: var(--transition);
+            line-height: 1.3;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: #1a202c;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.75rem;
+            margin-top: 3rem;
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+            text-align: center !important;
+        }
+
+        .text-center {
+            text-align: center !important;
+        }
+
+        .subsection-title {
+            font-size: 1.5rem;
+            color: #1a202c;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            transition: var(--transition);
+        }
+
+        p {
+            margin: 1rem 0;
+            font-size: 1.125rem;
+            text-align: justify;
+            color: var(--text-color);
+            transition: var(--transition);
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 2rem auto;
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+
+        img:hover {
+            transform: scale(1.01);
+        }
+
+        /* 新的封面头部样式 */
+        .cover-header {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cover-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: none;
+            background-color: rgb(255, 255, 255);
+            z-index: 0;
+        }
+
+        .cover-header .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .text-gradient {
+            background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .feature-card {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 0.75rem;
+            padding: 0.9rem 1.1rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 0.6rem;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            background-color: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .icon-wrapper {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: white;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .feature-content {
+            flex: 1;
+        }
+
+        .feature-content h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+            line-height: 1.3;
+        }
+
+        .feature-content p {
+            margin: 0;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* 添加一些工具类 */
+        .container {
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .mx-auto {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .max-w-7xl {
+            max-width: 80rem;
+        }
+
+        .transform {
+            transform: translateZ(0);
+        }
+
+        .hover\:scale-102:hover {
+            transform: scale(1.02);
+        }
+
+        .transition-all {
+            transition-property: all;
+        }
+
+        .duration-500 {
+            transition-duration: 500ms;
+        }
+
+        .shadow-2xl {
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .rounded-xl {
+            border-radius: 0.75rem;
+        }
+
+        .bg-gradient-to-b {
+            background-image: linear-gradient(to bottom, var(--primary-dark), var(--secondary-dark));
+        }
+
+        /* 波浪分隔线样式 */
+        .wave-divider {
+            position: relative;
+            height: 120px;
+            margin-top: -2px;
+            margin-bottom: -2px;
+            overflow: hidden;
+        }
+
+        .wave-divider svg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+
+        .wave-path {
+            fill: var(--secondary-dark);
+            transition: fill 0.3s ease;
+        }
+
+        .dark .wave-path {
+            fill: var(--secondary-dark);
+        }
+
+        .video-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .video-wrapper {
+            background-color: var(--card-bg);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .video-wrapper:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .video-aspect-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+
+        video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 0.5rem;
+        }
+
+        .task-box {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            transition: var(--transition);
+        }
+
+        .task-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .video-question-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .question-section {
+            margin-top: 1rem;
+            flex-grow: 1;
+            transition: var(--transition);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: rgba(var(--bg-color-rgb, 247, 250, 252), 0.5);
+        }
+
+        .question-section:hover {
+            background-color: rgba(var(--bg-color-rgb, 247, 250, 252), 0.8);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+
+        .question-section ul li {
+            transition: var(--transition);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .question-section ul li:hover {
+            background-color: rgba(var(--primary-color-rgb, 49, 130, 206), 0.1);
+            transform: translateX(5px);
+        }
+
+        .question-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .question-box {
+            background-color: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .question-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .question-box h3 {
+            color: #1a202c;
+            margin-top: 0;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.75rem;
+            font-size: 1.5rem;
+            transition: var(--transition);
+            text-align: center !important;
+        }
+
+        .question-box p {
+            font-size: 1.1rem;
+            text-align: left;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .question-box ul {
+            list-style-type: none;
+            padding-left: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .question-box li {
+            margin-bottom: 0.75rem;
+            font-size: 1.05rem;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            transition: background-color 0.2s ease;
+        }
+
+        .question-box li:hover {
+            background-color: rgba(66, 153, 225, 0.1);
+        }
+
+        .method-section img,
+        .experiment-section img,
+        .conclusion-section img {
+            max-width: 85%;
+            margin: 2.5rem auto;
+        }
+
+        .theme-toggle,
+        .back-to-top {
+            position: fixed;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            border: none;
+            transition: var(--transition);
+        }
+
+        .theme-toggle {
+            bottom: 2rem;
+            left: 2rem;
+        }
+
+        .back-to-top {
+            bottom: 2rem;
+            right: 2rem;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .theme-toggle:hover,
+        .back-to-top:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-3px);
+        }
+
+        .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6,
+        .dark .main-title, .dark .section-title, .dark .subsection-title,
+        .dark .question-box h3 {
+            color: #f7fafc;
+        }
+
+        /* 封面样式在暗色模式下保持一致 */
+
+        /* 封面特性卡片样式在暗色模式下保持一致 */
+
+        /* 导航栏样式 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background-color: var(--card-bg);
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            padding: 0.75rem 0;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.9);
+            transform: translateY(-100%);
+        }
+
+        .navbar.visible {
+            transform: translateY(0);
+        }
+
+        .dark .navbar {
+            background-color: rgba(26, 32, 44, 0.9);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: #1a202c;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            transition: var(--transition);
+        }
+
+        .dark .logo {
+            color: #f7fafc;
+        }
+
+        .logo-img {
+            height: 40px;
+            margin: 0 0.5rem 0 0;
+            display: inline-block;
+            vertical-align: middle;
+            box-shadow: none;
+            border-radius: 0;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-img:hover {
+            transform: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-links li {
+            margin-left: 2rem;
+        }
+
+        .nav-links a {
+            color: #1a202c;
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            padding: 0.5rem 0;
+            transition: var(--transition);
+        }
+
+        .dark .nav-links a {
+            color: #f7fafc;
+        }
+
+        .nav-links a:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-links a:hover:after {
+            width: 100%;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: #1a202c;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .dark .mobile-menu-btn {
+            color: #f7fafc;
+        }
+
+        /* 动效样式 */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .stagger-item {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .stagger-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .highlight {
+            color: #e53e3e;
+            font-weight: bold;
+            text-align: center;
+            padding: 1.5rem;
+            background-color: var(--highlight-bg);
+            border: 1px solid var(--highlight-border);
+            border-radius: 0.5rem;
+            margin: 2.5rem 0;
+            transition: var(--transition);
+        }
+
+        strong {
+            color: var(--secondary-color);
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background-color: var(--card-bg);
+                padding: 1rem 0;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links li {
+                margin: 0.5rem 2rem;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .content-container {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+
+            .main-title {
+                font-size: 1.8rem;
+            }
+
+            .section-title {
+                font-size: 1.6rem;
+            }
+
+            .subsection-title {
+                font-size: 1.3rem;
+            }
+
+            p {
+                font-size: 1rem;
+            }
+
+            .video-container,
+            .question-container {
+                grid-template-columns: 1fr;
+            }
+
+            .theme-toggle,
+            .back-to-top {
+                width: 2.5rem;
+                height: 2.5rem;
+            }
+
+            .cover-header .flex {
+                flex-direction: column;
+            }
+
+            .cover-header .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .text-gradient {
+                font-size: 1.8rem;
+            }
+
+            .feature-card {
+                padding: 1rem;
+            }
+
+            .icon-wrapper {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+        }
+
+        .affiliation-badge {
+            background-color: var(--bg-color);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: inline-block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-color);
+            transition: var(--transition);
+        }
+
+        .dark .affiliation-badge {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 阅读进度条 -->
+    <div class="reading-progress-bar" id="reading-progress"></div>
+
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <!-- <a href="#" class="logo">
+                <img src="source/Embodied-R.png" alt="Embodied-R Logo" class="logo-img">Embodied-R
+            </a> -->
+            <ul class="nav-links">
+                <li><a href="#task">Tasks</a></li>
+                <li><a href="#method">Method</a></li>
+                <li><a href="#experiment">Experiment</a></li>
+                <li><a href="#conclusion">Conclusion</a></li>
+                <li><a href="#citation">Citation</a></li>
+                <!-- <li><a href="#conclusion">Conclusion</a></li> -->
+            </ul>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <button class="theme-toggle" aria-label="Toggle dark/light mode">
+        <i class="fas fa-moon"></i>
+        <span class="fallback-icon" style="display:none;">🌙</span>
+    </button>
+    
+    <button class="back-to-top" aria-label="Back to top">
+        <i class="fas fa-arrow-up"></i>
+        <span class="fallback-icon" style="display:none;">⬆</span>
+    </button>
+
+    <!-- 封面设计 - 视频网格封面 -->
+    <header class="cover-header">
+        <!-- 添加Font Awesome图标库，确保图标可以正确加载 -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <!-- 添加Animate.css库 -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+        <!-- 添加自定义样式 -->
+        <style>
+            /* 封面样式 - 不受暗色模式影响 */
+            .cover-header {
+                position: relative !important;
+                height: 100vh !important;
+                width: 100% !important;
+                overflow: hidden !important;
+                margin-bottom: 0 !important;
+                background-color: #ffffff !important;
+                display: block !important;
+            }
+
+            /* 强制显示所有图标 */
+            .fas, .fab, .ai {
+                display: inline-block !important;
+            }
+
+            /* 隐藏所有fallback图标 */
+            .fallback-icon {
+                display: none !important;
+            }
+
+            /* 灰色透明蒙版 - 不受暗色模式影响 */
+            .overlay {
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                background-color: rgba(0, 0, 0, 0.5) !important;
+                z-index: 1 !important;
+            }
+
+            /* 居中文字 */
+            .text-container {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                z-index: 2;
+                text-align: center;
+                color: #111;
+                text-shadow: none;
+                width: 90%;
+                max-width: 1200px;
+                font-family: 'Noto Serif SC', serif, 'SimHei', 'Microsoft YaHei', '黑体', '宋体';
+            }
+
+            .text-container h1 {
+                font-size: 5.0em;
+                margin-bottom: 0.3em;
+                font-weight: 700;
+                letter-spacing: 3px;
+                color: #111;
+                line-height: 1.2;
+                text-shadow: none;
+            }
+
+            .text-container .main-subtitle {
+                font-size: 1.8em;
+                white-space: nowrap;
+                margin: 0.2em 0;
+                font-weight: 500;
+                color: #111;
+                line-height: 1.5;
+                text-shadow: none;
+            }
+
+            .text-container p {
+                font-size: 1.2em;
+                margin: 0.3em 0;
+                font-weight: 400;
+                color: rgba(255, 255, 255, 0.9);
+                line-height: 1.5;
+            }
+
+            /* 作者样式 */
+            .authors-section {
+                margin-top: 1.5rem;
+                text-align: center;
+                width: 100%;
+            }
+
+            /* 作者名字本体 */
+            .author-name {
+                font-family: 'Noto Serif SC', 'Times New Roman', serif;
+                font-size: 1.15rem;          /* 推荐 1.05 ~ 1.15 */
+                font-weight: 500;
+                color: #111;                /* 论文级深灰，不是纯黑 */
+                text-shadow: none;          /* 彻底去阴影 */
+                line-height: 1.6;
+                white-space: nowrap;
+            }
+
+            /* 上标 *, † */
+            .author-name sup {
+                font-size: 0.7em;
+                vertical-align: super;
+                margin-left: 1px;
+                color: #111;
+            }
+
+            /* 作者之间的逗号视觉更干净 */
+            .author-name + .author-name::before {
+                content: ", ";
+                color: #111;
+            }
+
+            /* 按钮样式 */
+            .action-buttons {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 1.5rem;
+                margin-top: 2rem;
+                position: absolute;
+                bottom: 15%;
+                left: 0;
+                right: 0;
+                z-index: 3;
+            }
+
+            .action-button {
+                padding: 0.5rem 1.5rem;
+                border-radius: 50px;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                background: rgba(0, 0, 0, 0.7);
+                color: white;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+
+            .action-button:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+                background: rgba(0, 0, 0, 0.8);
+            }
+
+            /* 主图样式 */
+            .main-image-container {
+                position: relative;
+                border-radius: 12px;
+                overflow: hidden;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+                transition: all 0.3s ease;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                margin: 2rem auto;
+            }
+
+            .main-image-container:hover {
+                transform: scale(1.01);
+            }
+
+            .main-image {
+                width: 100%;
+                height: auto;
+                display: block;
+            }
+
+            /* 响应式调整 */
+            @media (max-width: 768px) {
+                .text-container h1 {
+                    font-size: 2.5em;
+                }
+
+                .text-container .main-subtitle {
+                    font-size: 1.3em;
+                    white-space: normal;
+                }
+
+                .text-container p {
+                    font-size: 1em;
+                    white-space: normal;
+                }
+
+                .features-container {
+                    padding: 1rem;
+                    margin-top: 1.5rem;
+                }
+
+                .feature-item {
+                    font-size: 0.9em;
+                    gap: 0.5rem;
+                }
+
+                .action-button {
+                    padding: 0.7rem 1.2rem;
+                    font-size: 0.9rem;
+                }
+            }
+
+            /* 导航栏样式 - 滚动时显示 */
+            .navbar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                transition: transform 0.3s ease, background-color 0.3s ease;
+                transform: translateY(-100%);
+            }
+
+            .navbar.visible {
+                transform: translateY(0);
+            }
+        </style>
+
+        <!-- 灰色蒙版 -->
+        <!-- <div class="overlay"></div> -->
+
+        <!-- 中间白字 -->
+        <div class="text-container text-center">
+            <h1 class="text-center">ANWM</h1>
+            <p class="text-center main-subtitle">Aerial World Model for Long-horizon</p>
+            <p class="text-center main-subtitle">Visual Generation and  Navigation in 3D Space</p>
+
+            <div class="authors-section fade-in my-6">
+                <div class="flex flex-col items-center">
+                    <div class="w-full max-w-5xl mx-auto text-center">
+                        <div class="text-xl mb-3 font-medium">
+                            <p class="mb-2 flex justify-center flex-wrap gap-x-0">
+                                <span class="author-name">Weichen Zhang<sup>*</sup></span>
+                                <span class="author-name">Peizhi Tang<sup>*</sup></span>
+                                <span class="author-name">Xin Zeng</span>
+                                <!-- <a href="mailto:chgao96@gmail.com" class="author-link">Chen Gao<sup>†</sup></a>, -->
+                                <span class="author-name">Fanghang Man</span>
+                                <span class="author-name">Shiquan Yu</span>
+                                <span class="author-name">Zichao Dai</span>
+                                <span class="author-name">Baining Zhao</span>
+                            </p>
+                            <p class="flex justify-center flex-wrap gap-x-0">
+                                <span class="author-name">Hongjin Chen</span>
+                                <span class="author-name">Yu Shang</span>
+                                <!-- <a href="mailto:chen.xinlei@sz.tsinghua.edu.cn" class="author-link">Xinlei Chen<sup>†</sup></a>, -->
+                                <span class="author-name">Wei Wu</span>
+                                <span class="author-name">Chen Gao</span>
+                                <span class="author-name">Xinlei Chen</span>
+                                <span class="author-name">Xin Wang</span>
+                                <span class="author-name">Yong Li</span>
+                                <span class="author-name">Wenwu Zhu</span>
+                            </p>
+                        </div>
+
+                        <div class="text-base text-gray-600 mt-2 mb-2 italic">
+                            <sup>*</sup> Equal contribution
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="inline-block font-bold text-xl">
+                                <i class="fas fa-university text-primary-color mr-1"></i>
+                                <span>Tsinghua University</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 按钮区域 -->
+        <div class="action-buttons">
+            <a href="https://www.arxiv.org/abs/2512.21887" class="action-button">
+                <i class="ai ai-arxiv"></i>
+                <span>arXiv</span>
+            </a>
+            <a href="https://www.arxiv.org/pdf/2512.21887" class="action-button">
+                <i class="fas fa-file-pdf"></i>
+                <span>PDF</span>
+            </a>
+            <a href="https://github.com/XinZeng-ai/ANWM" class="action-button">
+                <i class="fab fa-github"></i>
+                <span>Code</span>
+            </a>
+        </div>
+    </header>
+
+
+
+    <div class="content-container" style="margin-top: 2rem; border-radius: 1rem;">
+
+
+        <h2 id="task" class="section-title text-center fade-in">Task of Visual Navigation in Large-Scale Aerial Space</h2>
+
+        <p class="fade-in">
+            Unmanned aerial vehicles (UAVs) have emerged as powerful embodied agents. One of the core abilities is autonomous navigation in large-scale three-dimensional environments. Existing navigation policies, however, are typically optimized for low-level objectives such as obstacle avoidance and trajectory smoothness, lacking the ability to incorporate high-level semantics into planning. In that case, constructing a world model for visual navigation in aerial spaces has two main challenges:
+        </p>
+        <p class="fade-in">
+            <strong>1. Complex action space</strong>: Compared to ground robots with only three degrees of freedom (DoF), UAVs have six DoF. Even without considering pitch and roll, the UAV action space remains four-dimensional. Building a world model that can accurately map such a high-dimensional action space to corresponding visual observations is inherently difficult.
+        </p>
+        <p class="fade-in">
+            <strong>2. Long-horizon visual generation</strong>: Unlike indoor navigation, aerial navigation typically involves long-horizon locomotion, where the visual target is usually beyond the current field of view and often over 100 meters away from the UAV. Therefore, long horizon refers not only to the temporal dimension but also to the spatial extent. Ensuring longhorizon spatial and temporal consistency in generated visual observations is particularly challenging.
+        </p>
+        <img src="source/story.png" alt="Task of Visual Navigation in Large-Scale Aerial Space" class="fade-in" style="width: 85%; max-width: 1084px; height: auto; object-fit: contain;">
+        <p class="fade-in">
+            To address the challenges above, we propose an <strong>Aerial Navigation World Model (ANWM)</strong>, an aerial navigation world model that predicts future visual observations conditioned on past frames and actions, thereby enabling agents to rank candidate trajectories by their semantic plausibility and navigational utility. ANWM is trained on 4-DoF UAV trajectories and introduces a physics-inspired module: Future Frame Projection (FFP), which projects past frames into future viewpoints to provide coarse geometric priors. This module mitigates representational uncertainty in long-distance visual generation and captures the mapping between 3D trajectories and egocentric observations. Empirical results demonstrate that ANWM significantly outperforms existing world models in long-distance visual forecasting and improves UAV navigation success rates in large-scale environments.
+        </p>
+        <p class="fade-in">
+            The main contributions of this paper are as follows:
+        </p>
+        <p class="fade-in">
+            <strong>· We introduce a large-scale dataset for training and testing the world model for aerial visual generation and navigation, containing 350k trajectory segments with corresponding visual observations.</strong>
+        </p>
+        <p class="fade-in">
+            <strong>· The first action-conditioned world model in aerial space, capable of predicting long-horizon visual observations from 3D actions.</strong>
+        </p>
+        <p class="fade-in">
+            <strong>· Experimental results demonstrate that our proposed ANWM exhibits spatio-temporally consistent capability in long-horizon navigation, outperforming existing action-conditioned world models.</strong>
+        </p>
+
+        <h2 id="method" class="section-title text-center fade-in">Method</h2>
+        <div class="method-section">
+            <p class="fade-in">
+            Our proposed ANWM produces future visual observations conditioned on the noisy latent, the past-frame latent, the projected future-frame latent, and the embedding of the upcoming action for single-frame generation. We employ the Future Frame Projection module to warp the past frame into the future viewpoint, providing a strong scene prior for generation. For long-horizon generation, ANWM operates in an autoregressive manner to generate sequential visual observations along the trajectory. Each newly generated frame is appended to the past-frame queue which is then used as input for the next observation generation.
+            </p>
+            <img src="source/framework_v3.jpg" alt="Framework Overview" class="fade-in" style="width: 85%; max-width: 1084px; height: auto; object-fit: contain;">
+            <p class="fade-in">
+                ANWM adopts CDiT as the backbone but uses the past frame and the projected future frame as distinct conditional signals to control the generation process. Specifically, ANWM first splits the condition latents into the past-frame latent and the projected future-frame latent, and applies separate scale and shift parameters to modulate the strength of the conditioning signal. The modulated latents are then fed into two shared-weight Multi-Head Cross-Attention branches.
+            </p>
+            <img src="source/arch_overview.png" alt="Framework Overview" class="fade-in" style="width: 85%; max-width: 1084px; height: auto; object-fit: contain;">
+            <p class="fade-in">
+                <strong>Future Frame Projection (FFP)</strong>: We design the FFP module that generates a coarse future frame prior, which is then concatenated with the past frame latents as the conditional input. In that case, we obtain a coarse estimation of the target frame by leveraging the visual cues from all historical observations, which provide an essential prior for future frame generation.
+            </p>
+            <p class="fade-in">
+                <strong>Independent Latent Modulation</strong>: To address the distribution shift between real historical observations and synthesized future projections, we propose to modulate these latents separately, enhancing the stability of the generative process. We utilize the Conditional Diffusion Transformer (CDiT) as the core backbone, effectively integrating action embeddings for precise future frame denoising and generation. By applying sequential Multi-Head Cross-Attention (MHCA) blocks, the model successfully captures both historical semantics and projected perspective features to ensure spatiotemporal consistency.
+            </p>
+        </div>
+
+        <h2 id="experiment" class="section-title text-center fade-in">Experiment</h2>
+        <div class="experiment-section">
+            <h3 class="subsection-title fade-in">Experimental Setup</h3>
+            <p class="fade-in">
+                We evaluate the performance using the 1.1k 2D trajectory segments and 1.1k 3D trajectory segments. For both the 2D and 3D setups, 1,000 segments are used to test the model's generative capability, and the remaining 100 segments are used to evaluate its navigation performance, which is consistent with the experimental setup of NWM. 
+            </p>
+            <p class="fade-in">
+                In our experiments, we compare our method against three representative world models that generate future observations conditioned on action inputs: NWM, Matrix-Game, and YUME. In addition, we compute the average motion velocity of the baseline agents and generate videos of varying durations to ensure that the distance traveled within the same time interval is consistent with that of ANWM.
+            </p>
+
+            <h3 class="subsection-title fade-in">Generative results of 2D and 3D trajectories</h3>
+            <p class="fade-in">
+                We report the generation results at 4s, 8s, 16s, and 32s. We have the following observations: 1) For both 2D and 3D trajectories, the performance of all baselines degrades as the trajectory length increases, indicating that the reliability of generated observations decreases with distance. 2) Within the 32s, our method consistently achieves the best performance of generating visual observations across all evaluation metrics for both 2D and 3D trajectories. 3) The results of YUME and NWM at 16 s and 32 s are significantly worse than those of our method, suggesting that they are limited in generating consistent visual observations along long-range trajectories.
+            </p>
+            <img src="source/gen_result.png" alt="Generative results of 2D and 3D trajectories" class="fade-in" style="width: 75%; max-width: 1084px; height: auto; object-fit: contain;">
+            <img src="source/qual_gen3.png" alt="Qualitative results comparison" class="fade-in" style="width: 75%; max-width: 1084px; height: auto; object-fit: contain;">
+            <p class="fade-in">
+                Although NWM and Matrix-Game can produce visually plausible images, their results gradually deviate from the actual motion trajectory as the path length increases. In contrast, YUME suffers from mode collapse at the early stage of generation. Even for 3D trajectories with large altitude variations, ANWM can maintain accurate correspondence between the generated observations and the underlying motion trajectory.
+            </p>
+
+            <h3 class="subsection-title fade-in">2D and 3D navigation results</h3>
+            <p class="fade-in">
+                ANWM achieves the highest navigation success rate and the lowest navigation error in both 2D and 3D navigation tasks. Specifically, the ATE of ANWM is reduced by 5.1% compared to the second-best method, while the SR is improved by 10% For 3D navigation results, our method outperforms NWM by 2% in terms of SR and 4.7% in terms of ATE, further demonstrating the effectiveness and robustness of our approach in long-range navigation.
+            </p>
+            <img src="source/nav_result.png" alt="case" class="fade-in" style="width: 75%; max-width: 1084px; height: auto; object-fit: contain;">
+
+        </div>
+
+        <h2 id="conclusion" class="section-title text-center fade-in">Conclusion</h2>
+
+        <div class="conclusion">
+            <p class="fade-in">
+                In this work, we present ANWM, the first aerial world model capable of generating long-horizon visual observations along 3D trajectories for UAV navigation. Experimental results demonstrate the effectiveness of ANWM in long-range visual generation and 3D navigation accuracy. We also discuss several limitations of ANWM in generating fine-grained textures and providing timely guidance for UAV path planning, which we plan to address through enhanced physical constraints and 3D path planning algorithms.
+            </p>
+
+        </div>
+
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.querySelector('.theme-toggle');
+        const htmlElement = document.documentElement;
+        const themeIcon = document.querySelector('.theme-toggle i');
+        const themeIconFallback = document.querySelector('.theme-toggle .fallback-icon');
+
+        // 检查Font Awesome是否加载成功
+        function checkFontAwesome() {
+            const spanFA = document.createElement('span');
+            spanFA.className = 'fa';
+            spanFA.style.display = 'none';
+            document.body.insertBefore(spanFA, document.body.firstChild);
+
+            const isFALoaded = window.getComputedStyle(spanFA).fontFamily.includes('FontAwesome');
+            document.body.removeChild(spanFA);
+
+            if (!isFALoaded) {
+                // 如果Font Awesome未加载，显示备用图标
+                document.querySelectorAll('.fallback-icon').forEach(el => {
+                    el.style.display = 'inline';
+                });
+                document.querySelectorAll('.fas').forEach(el => {
+                    el.style.display = 'none';
+                });
+
+                // 替换列表项的圆点图标
+                document.querySelectorAll('ul li .fas.fa-circle').forEach(el => {
+                    el.parentNode.innerHTML = '● ' + el.parentNode.innerHTML.replace(el.outerHTML, '');
+                });
+            }
+        }
+
+        // 页面加载后检查Font Awesome
+        window.addEventListener('load', checkFontAwesome);
+
+        // Check for system preference or saved preference
+        if (localStorage.getItem('theme') === 'dark' ||
+            (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            htmlElement.classList.add('dark');
+            themeIcon.classList.remove('fa-moon');
+            themeIcon.classList.add('fa-sun');
+            themeIconFallback.textContent = '☀️';
+        }
+
+        themeToggle.addEventListener('click', () => {
+            htmlElement.classList.toggle('dark');
+
+            if (htmlElement.classList.contains('dark')) {
+                localStorage.setItem('theme', 'dark');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                themeIconFallback.textContent = '☀️';
+            } else {
+                localStorage.setItem('theme', 'light');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                themeIconFallback.textContent = '🌙';
+            }
+        });
+
+        // Back to top functionality
+        const backToTopButton = document.querySelector('.back-to-top');
+
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopButton.classList.add('visible');
+            } else {
+                backToTopButton.classList.remove('visible');
+            }
+
+            // 更新阅读进度条
+            updateReadingProgress();
+        });
+
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // 移动端菜单切换
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const navLinks = document.querySelector('.nav-links');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+
+        // 平滑滚动到锚点
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+
+                    // 如果在移动端，点击后关闭菜单
+                    if (window.innerWidth <= 768) {
+                        navLinks.classList.remove('active');
+                    }
+                }
+            });
+        });
+
+        // 滚动动效
+        function checkVisibility() {
+            const fadeElements = document.querySelectorAll('.fade-in');
+            const staggerItems = document.querySelectorAll('.stagger-item');
+
+            fadeElements.forEach((element, index) => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+
+                if (elementTop < window.innerHeight - elementVisible) {
+                    element.classList.add('visible');
+                }
+            });
+
+            staggerItems.forEach((element, index) => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+
+                if (elementTop < window.innerHeight - elementVisible) {
+                    setTimeout(() => {
+                        element.classList.add('visible');
+                    }, 100 * (index % 5)); // 每5个元素一组，错开显示时间
+                }
+            });
+        }
+
+        // 初始检查可见性
+        window.addEventListener('load', checkVisibility);
+        // 滚动时检查可见性
+        window.addEventListener('scroll', checkVisibility);
+
+        // 确保所有text-center类的元素都居中显示
+        function enforceTextCenter() {
+            document.querySelectorAll('.text-center').forEach(el => {
+                el.style.textAlign = 'center';
+            });
+
+            document.querySelectorAll('.main-title, .section-title, h3.text-center').forEach(el => {
+                el.style.textAlign = 'center';
+            });
+        }
+
+        // 初始检查可见性和样式
+        window.addEventListener('load', function() {
+            checkVisibility();
+            checkFontAwesome();
+            enforceTextCenter();
+            updateReadingProgress();
+        });
+
+        // 阅读进度条功能
+        function updateReadingProgress() {
+            const progressBar = document.getElementById('reading-progress');
+            const totalHeight = document.body.scrollHeight - window.innerHeight;
+            const progress = (window.scrollY / totalHeight) * 100;
+            progressBar.style.width = `${progress}%`;
+
+            // 控制导航栏显示
+            const navbar = document.querySelector('.navbar');
+            const coverHeader = document.querySelector('.cover-header');
+            const coverHeight = coverHeader.offsetHeight;
+
+            if (window.scrollY > coverHeight - 100) {
+                navbar.classList.add('visible');
+            } else {
+                navbar.classList.remove('visible');
+            }
+        }
+
+        // 监听滚动事件以更新进度条和导航栏显示
+        window.addEventListener('scroll', updateReadingProgress);
+    </script>
+
+    <!-- 引用部分 -->
+    <div class="content-container" style="margin-top: 2rem; border-radius: 1rem;">
+        <h2 id="citation" class="section-title text-center fade-in">Citation</h2>
+        <div class="citation-section">
+            <pre style="background-color: var(--bg-color); padding: 1.5rem; border-radius: 0.5rem; overflow-x: auto; font-size: 0.9rem; border: 1px solid var(--border-color); box-shadow: var(--shadow);">
+@misc{zhang2025aerialworldmodellonghorizon,
+      title={Aerial World Model for Long-horizon Visual Generation and Navigation in 3D Space}, 
+      author={Weichen Zhang and Peizhi Tang and Xin Zeng and Fanhang Man and Shiquan Yu and Zichao Dai and Baining Zhao and Hongjin Chen and Yu Shang and Wei Wu and Chen Gao and Xinlei Chen and Xin Wang and Yong Li and Wenwu Zhu},
+      year={2025},
+      eprint={2512.21887},
+      archivePrefix={arXiv},
+      primaryClass={cs.RO},
+      url={https://arxiv.org/abs/2512.21887}, 
+}
+            </pre>
+        </div>
+    </div>
+</body>
+</html>
